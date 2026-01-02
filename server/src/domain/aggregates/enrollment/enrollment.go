@@ -1,11 +1,10 @@
 package enrollment
 
 import (
-	"adaptivetesting/src/domain/course"
-	"adaptivetesting/src/domain/group"
-	"adaptivetesting/src/domain/topic"
-	"adaptivetesting/src/domain/user"
-	"time"
+	"adaptivetesting/src/domain/aggregates/course"
+	"adaptivetesting/src/domain/aggregates/group"
+	"adaptivetesting/src/domain/aggregates/topic"
+	"adaptivetesting/src/domain/aggregates/user"
 
 	"github.com/google/uuid"
 )
@@ -21,12 +20,6 @@ type Enrollment struct {
 	progress      float32
 }
 
-type TopicProgress struct {
-	maxScore float32
-	attempts []TopicAttempt
-}
-
-type TopicAttempt struct {
-	score       float32
-	attemptedAt time.Time
+func (e Enrollment) ID() EnrollmentID {
+	return e.id
 }

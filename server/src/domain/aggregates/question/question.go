@@ -1,7 +1,7 @@
 package question
 
 import (
-	"adaptivetesting/src/domain/question/entities"
+	"adaptivetesting/src/domain/aggregates/topic"
 
 	"github.com/google/uuid"
 )
@@ -10,6 +10,7 @@ type QuestionID uuid.UUID
 
 type Question struct {
 	id      QuestionID
-	text    string
-	answers []entities.Answer
+	topicID topic.TopicID
+	text    QuestionText
+	answers []Answer
 }
