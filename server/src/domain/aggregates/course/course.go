@@ -9,6 +9,10 @@ import (
 
 type CourseID uuid.UUID
 
+func (id CourseID) String() string {
+	return uuid.UUID(id).String()
+}
+
 type Course struct {
 	id          CourseID
 	createdByID user.UserID
@@ -19,10 +23,32 @@ type Course struct {
 	groupCount int
 }
 
+// GET
 func (c *Course) ID() CourseID {
 	return c.id
 }
 
+func (c *Course) Name() CourseName {
+	return c.name
+}
+
+func (c *Course) CreatedByID() user.UserID {
+	return c.createdByID
+}
+
+func (c *Course) IsArchived() bool {
+	return c.isArchived
+}
+
+func (c *Course) TopicCount() int {
+	return c.topicCount
+}
+
+func (c *Course) GroupCount() int {
+	return c.groupCount
+}
+
+// SET
 func (this *Course) AddTopic() error {
 	this.topicCount += 1
 	return nil
@@ -63,4 +89,8 @@ func (this *Course) Archivate() error {
 		return nil
 	}
 	return fmt.Errorf("course already archived")
+}
+
+func (this *Course) IsUserCreator(user user.User) bool {
+	return this.createdByID == user.ID()
 }

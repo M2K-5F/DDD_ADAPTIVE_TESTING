@@ -1,0 +1,30 @@
+{
+    "Validation Error: String Too Short": {
+		"prefix": "lmin",
+		"body": [
+			"return \"\", fmt.Errorf(",
+			"\t\"${1:Field} length (%d) is less than required minimum (${2:MinValue})\",", 
+			"\tlen(plain),",
+			")",
+		],
+		"description": "Error for string shorter than minimum"
+	},
+	"Validation Error: String Too Long": {
+		"prefix": "gmax",
+		"body": [
+			"return \"\", fmt.Errorf(",
+			"\t\"${1:Field} length (%d) is greater than required maximum (${2:MaxValue})\",", 
+			"\tlen(plain),",
+			")",
+		],
+		"description": "Error for string longer than maximum"
+	},
+    "err": {
+		"prefix": "er",
+		"body": "if err != nil {\n\treturn nil, err\n}"
+	},
+	"ifer": {
+		"prefix": ["ifer"],
+		"body": "if err := $1; err != nil {\n\treturn nil, err\n}"
+	}
+}

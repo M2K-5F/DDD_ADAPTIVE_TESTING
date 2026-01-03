@@ -2,11 +2,16 @@ package course
 
 import (
 	"adaptivetesting/src/domain/aggregates/user"
+	"fmt"
 
 	"github.com/google/uuid"
 )
 
 func NewCourse(teacher user.User, name string) (*Course, error) {
+	if !teacher.IsTeacher() {
+		return nil, fmt.Errorf("Only teachers can create courses")
+	}
+
 	nameVO, err := NewCourseName(name)
 	if err != nil {
 		return nil, err
