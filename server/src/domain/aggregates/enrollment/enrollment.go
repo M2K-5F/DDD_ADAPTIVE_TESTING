@@ -1,25 +1,18 @@
 package enrollment
 
 import (
-	"adaptivetesting/src/domain/aggregates/course"
-	"adaptivetesting/src/domain/aggregates/group"
-	"adaptivetesting/src/domain/aggregates/topic"
-	"adaptivetesting/src/domain/aggregates/user"
-
-	"github.com/google/uuid"
+	"adaptivetesting/src/domain/aggregates/identificators"
 )
 
-type EnrollmentID uuid.UUID
-
 type Enrollment struct {
-	id            EnrollmentID
-	groupID       group.GroupID
-	courseID      course.CourseID
-	userID        user.UserID
-	topicProgress map[topic.TopicID]*TopicProgress
+	id            identificators.EnrollmentID
+	groupID       identificators.GroupID
+	courseID      identificators.CourseID
+	userID        identificators.UserID
+	topicProgress map[identificators.TopicID]*TopicProgress
 	progress      float32
 }
 
-func (e Enrollment) ID() EnrollmentID {
+func (e Enrollment) ID() identificators.EnrollmentID {
 	return e.id
 }

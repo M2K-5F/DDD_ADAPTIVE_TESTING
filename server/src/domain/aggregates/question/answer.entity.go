@@ -19,3 +19,15 @@ func NewAnswer(serialNumber int, text string, isCorrect bool) (*Answer, error) {
 		serialNumber: serialNumber,
 	}, nil
 }
+
+func (this *Answer) SerialNumber() int {
+	return this.serialNumber
+}
+
+func (this *Answer) Text() AnswerText {
+	return this.text
+}
+
+func (this *Answer) IsCorrect() bool {
+	return this.isCorrect
+}

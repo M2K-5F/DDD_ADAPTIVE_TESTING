@@ -1,4 +1,4 @@
-package dto
+package requests
 
 type Role string
 

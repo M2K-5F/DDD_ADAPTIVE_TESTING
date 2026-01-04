@@ -1,18 +1,19 @@
 package course_usercases
 
 import (
-	"adaptivetesting/src/application/dto"
+	"adaptivetesting/src/application/dto/requests"
+	"adaptivetesting/src/application/dto/responses"
 	"adaptivetesting/src/application/mappers"
 	"adaptivetesting/src/domain/aggregates/course"
 	"adaptivetesting/src/domain/aggregates/user"
 	"fmt"
 )
 
-type ArchiveCourseUC struct {
+type CourseAchive struct {
 	courseRepo course.ICourseRepository
 }
 
-func (uc *ArchiveCourseUC) Execute(current_user user.User, data *dto.ArchiveCourseDTO) (*dto.CourseResponseWithUser, error) {
+func (uc *CourseAchive) Execute(current_user user.User, data *requests.ArchiveCourseDTO) (*responses.CourseResponseWithUser, error) {
 	crs, err := uc.courseRepo.GetById(data.CourseID)
 	if err != nil {
 		return nil, err
@@ -26,8 +27,7 @@ func (uc *ArchiveCourseUC) Execute(current_user user.User, data *dto.ArchiveCour
 		return nil, err
 	}
 
-	err = uc.courseRepo.Save(crs)
-	if err != nil {
+	if err := uc.courseRepo.Save(crs); err != nil {
 		return nil, err
 	}
 

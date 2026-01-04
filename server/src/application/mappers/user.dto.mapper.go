@@ -1,17 +1,17 @@
 package mappers
 
 import (
-	"adaptivetesting/src/application/dto"
+	"adaptivetesting/src/application/dto/responses"
 	"adaptivetesting/src/domain/aggregates/user"
 )
 
-func UserToDTO(user *user.User) *dto.UserResponse {
+func UserToDTO(user *user.User) *responses.UserResponse {
 	roles := []string{}
 	for _, role := range user.Roles() {
 		roles = append(roles, role.String())
 	}
 
-	return &dto.UserResponse{
+	return &responses.UserResponse{
 		UserName:     user.UserName().String(),
 		RegisteredAt: user.RegisteredAt(),
 		Roles:        roles,

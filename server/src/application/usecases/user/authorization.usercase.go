@@ -1,17 +1,18 @@
 package user_usercases
 
 import (
-	"adaptivetesting/src/application/dto"
+	"adaptivetesting/src/application/dto/requests"
+	"adaptivetesting/src/application/dto/responses"
 	"adaptivetesting/src/application/mappers"
-	user "adaptivetesting/src/domain/aggregates/user"
+	"adaptivetesting/src/domain/aggregates/user"
 	"fmt"
 )
 
-type AuthorizationUserUC struct {
+type UserAuthorization struct {
 	userRepo user.IUserRepository
 }
 
-func (uc *AuthorizationUserUC) Execute(data *dto.AuthUserDTO) (*dto.UserResponse, error) {
+func (uc *UserAuthorization) Execute(data *requests.AuthUserDTO) (*responses.UserResponse, error) {
 	if !uc.userRepo.IsUsernameExists(data.UserName) {
 		return nil, fmt.Errorf("Username does not exists")
 	}

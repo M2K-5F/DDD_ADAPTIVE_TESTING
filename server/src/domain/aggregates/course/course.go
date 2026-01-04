@@ -1,30 +1,26 @@
 package course
 
 import (
+	"adaptivetesting/src/domain/aggregates/identificators"
 	"adaptivetesting/src/domain/aggregates/user"
 	"fmt"
-
-	"github.com/google/uuid"
+	"slices"
 )
 
-type CourseID uuid.UUID
-
-func (id CourseID) String() string {
-	return uuid.UUID(id).String()
-}
-
 type Course struct {
-	id          CourseID
-	createdByID user.UserID
+	id          identificators.CourseID
+	createdByID identificators.UserID
 	name        CourseName
 	isArchived  bool
 
 	topicCount int
+	topicIDs   []identificators.TopicID
 	groupCount int
+	groupIDs   []identificators.GroupID
 }
 
-// GET
-func (c *Course) ID() CourseID {
+// QUERY
+func (c *Course) ID() identificators.CourseID {
 	return c.id
 }
 
@@ -32,7 +28,7 @@ func (c *Course) Name() CourseName {
 	return c.name
 }
 
-func (c *Course) CreatedByID() user.UserID {
+func (c *Course) CreatedByID() identificators.UserID {
 	return c.createdByID
 }
 
@@ -48,22 +44,31 @@ func (c *Course) GroupCount() int {
 	return c.groupCount
 }
 
-// SET
-func (this *Course) AddTopic() error {
+func (this *Course) IsTopicPresentAtCourse(topicID identificators.TopicID) bool {
+	return slices.Contains(this.topicIDs, topicID)
+}
+
+func (this *Course) IsGroupPresentAtCourse(groupID identificators.GroupID) bool {
+	return slices.Contains(this.groupIDs, groupID)
+}
+
+// COMMAND
+func (this *Course) AddTopic(topicID identificators.TopicID) error {
+	if this.IsTopicPresentAtCourse(topicID) {
+		return fmt.Errorf("This topic already presented at course")
+	}
+
 	this.topicCount += 1
+	this.topicIDs = append(this.topicIDs, topicID)
 	return nil
 }
 
-func (this *Course) RemoveTopic() error {
-	if this.topicCount > 1 {
-		this.topicCount -= 1
-		return nil
+func (this *Course) AddGroup(groupID identificators.GroupID) error {
+	if this.IsGroupPresentAtCourse(groupID) {
+		return fmt.Errorf("Group Already presented at course")
 	}
-	return fmt.Errorf("course topic count is 0")
-}
-
-func (this *Course) AddGroup() error {
 	this.groupCount += 1
+	this.groupIDs = append(this.groupIDs, groupID)
 	return nil
 }
 
@@ -91,6 +96,6 @@ func (this *Course) Archivate() error {
 	return fmt.Errorf("course already archived")
 }
 
-func (this *Course) IsUserCreator(user user.User) bool {
+func (this *Course) IsUserCreator(user *user.User) bool {
 	return this.createdByID == user.ID()
 }

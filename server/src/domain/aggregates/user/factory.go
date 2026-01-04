@@ -1,6 +1,7 @@
 package user
 
 import (
+	"adaptivetesting/src/domain/aggregates/identificators"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,7 +19,7 @@ func NewStudent(username string, password string) (*User, error) {
 		return nil, err
 	}
 	return &User{
-		id:           UserID(uuid.New()),
+		id:           identificators.UserID(uuid.New()),
 		registeredAt: time.Now(),
 		roles:        []Role{StudentRole},
 		userName:     usernameVO,
@@ -40,7 +41,7 @@ func NewTeacher(username string, password string) (*User, error) {
 		userName:     usernameVO,
 		registeredAt: time.Now(),
 		roles:        []Role{TeacherRole, StudentRole},
-		id:           UserID(uuid.New()),
+		id:           identificators.UserID(uuid.New()),
 		passwordHash: hash,
 	}, nil
 }

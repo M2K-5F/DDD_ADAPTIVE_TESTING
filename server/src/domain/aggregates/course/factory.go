@@ -1,6 +1,7 @@
 package course
 
 import (
+	"adaptivetesting/src/domain/aggregates/identificators"
 	"adaptivetesting/src/domain/aggregates/user"
 	"fmt"
 
@@ -21,7 +22,7 @@ func NewCourse(teacher user.User, name string) (*Course, error) {
 		createdByID: teacher.ID(),
 		name:        nameVO,
 		isArchived:  false,
-		id:          CourseID(uuid.New()),
+		id:          identificators.CourseID(uuid.New()),
 		topicCount:  0,
 		groupCount:  0,
 	}, nil

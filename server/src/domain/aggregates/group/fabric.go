@@ -2,6 +2,7 @@ package group
 
 import (
 	"adaptivetesting/src/domain/aggregates/course"
+	"adaptivetesting/src/domain/aggregates/identificators"
 
 	"github.com/google/uuid"
 )
@@ -13,8 +14,9 @@ func NewGroup(course course.Course, name string, maxStudentCount int) (*Group, e
 	}
 	return &Group{
 		name:            nameVO,
-		id:              GroupID(uuid.New()),
-		courseID:        course.ID(),
+		id:              identificators.GroupID(uuid.New()),
+		byCourseID:      course.ID(),
+		createdByID:     course.CreatedByID(),
 		maxStudentCount: maxStudentCount,
 		studentCount:    0,
 	}, nil

@@ -1,27 +1,21 @@
 package user
 
 import (
+	"adaptivetesting/src/domain/aggregates/identificators"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // USER
-type UserID uuid.UUID
-
-func (i UserID) String() string {
-	return uuid.UUID(i).String()
-}
 
 type User struct {
-	id           UserID
+	id           identificators.UserID
 	registeredAt time.Time
 	userName     Username
 	roles        []Role
 	passwordHash Password
 }
 
-func (this *User) ID() UserID {
+func (this *User) ID() identificators.UserID {
 	return this.id
 }
 

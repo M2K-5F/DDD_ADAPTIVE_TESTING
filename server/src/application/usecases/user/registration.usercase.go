@@ -1,17 +1,18 @@
 package user_usercases
 
 import (
-	"adaptivetesting/src/application/dto"
+	"adaptivetesting/src/application/dto/requests"
+	"adaptivetesting/src/application/dto/responses"
 	"adaptivetesting/src/application/mappers"
 	"adaptivetesting/src/domain/aggregates/user"
 	"fmt"
 )
 
-type RegisterUserUC struct {
+type UserRegistration struct {
 	userRepo user.IUserRepository
 }
 
-func (r *RegisterUserUC) Execute(data dto.RegisterUserDTO) (*dto.UserResponse, error) {
+func (r *UserRegistration) Execute(data requests.RegisterUserDTO) (*responses.UserResponse, error) {
 	if r.userRepo.IsUsernameExists(data.UserName) {
 		return nil, fmt.Errorf("Username already exists")
 	}
@@ -29,19 +30,19 @@ func (r *RegisterUserUC) Execute(data dto.RegisterUserDTO) (*dto.UserResponse, e
 	return mappers.UserToDTO(newUser), nil
 }
 
-func (uc *RegisterUserUC) createUserByRole(data dto.RegisterUserDTO) (*user.User, error) {
+func (uc *UserRegistration) createUserByRole(data requests.RegisterUserDTO) (*user.User, error) {
 	switch data.Role {
-	case dto.Teacher:
+	case requests.Teacher:
 		return user.NewTeacher(data.UserName, data.Password)
-	case dto.Student:
+	case requests.Student:
 		return user.NewStudent(data.UserName, data.Password)
 	default:
 		return nil, fmt.Errorf("unknown role: %s", data.Role)
 	}
 }
 
-func (RegisterUserUC) Fabric(userRepoImplementation user.IUserRepository) *RegisterUserUC {
-	return &RegisterUserUC{
+func (UserRegistration) Fabric(userRepoImplementation user.IUserRepository) *UserRegistration {
+	return &UserRegistration{
 		userRepo: userRepoImplementation,
 	}
 }

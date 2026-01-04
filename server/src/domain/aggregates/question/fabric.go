@@ -1,6 +1,7 @@
 package question
 
 import (
+	"adaptivetesting/src/domain/aggregates/identificators"
 	"adaptivetesting/src/domain/aggregates/topic"
 
 	"github.com/google/uuid"
@@ -34,7 +35,7 @@ func NewQuestion(topic topic.Topic, text string, answers []AnswerDTO) (*Question
 	}
 
 	return &Question{
-		id:      QuestionID(uuid.New()),
+		id:      identificators.QuestionID(uuid.New()),
 		topicID: topic.ID(),
 		text:    textVO,
 		answers: answerList,
