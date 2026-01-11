@@ -1,23 +1,24 @@
 package user_usercases
 
 import (
+	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/mappers"
-	"adaptivetesting/src/domain/aggregates/user"
+	"adaptivetesting/src/application/interfaces"
+	"context"
 	"fmt"
 )
 
 type UserAuthorization struct {
-	userRepo user.IUserRepository
+	userReader interfaces.IUserReader
 }
 
-func (uc *UserAuthorization) Execute(data *requests.AuthUserDTO) (*responses.UserResponse, error) {
-	if !uc.userRepo.IsUsernameExists(data.UserName) {
+func (this *UserAuthorization) Execute(ctx context.Context, data *requests.AuthUserDTO) (*responses.UserResponse, error) {
+	if !this.userReader.IsUserNameExists(ctx, data.UserName) {
 		return nil, fmt.Errorf("Username does not exists")
 	}
 
-	usr, err := uc.userRepo.GetByUserName(data.UserName)
+	usr, err := this.userReader.GetByUserName(ctx, data.UserName)
 	if err != nil {
 		return nil, err
 	}
@@ -26,5 +27,5 @@ func (uc *UserAuthorization) Execute(data *requests.AuthUserDTO) (*responses.Use
 		return nil, fmt.Errorf("Uncorrect password")
 	}
 
-	return mappers.UserToDTO(usr), nil
+	return mappers.UserToResponse(usr), nil
 }

@@ -1,26 +1,34 @@
 package group_usecases
 
 import (
+	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/mappers"
-	"adaptivetesting/src/domain/aggregates/course"
+	"adaptivetesting/src/application/interfaces"
 	"adaptivetesting/src/domain/aggregates/group"
 	"adaptivetesting/src/domain/aggregates/user"
+	"context"
 	"fmt"
 )
 
 type CreateGroup struct {
-	groupRepo  group.IRepository
-	courseRepo course.ICourseRepository
+	courseReader interfaces.ICourseReader
+	writer       interfaces.IWriter
 }
 
-func (this *CreateGroup) Execute(current_user *user.User, data *requests.CreateGroupRequest) (*responses.GroupNestedResponse, error) {
-	current_course, err := this.courseRepo.GetById(data.CourseID)
+func (this *CreateGroup) Execute(
+	ctx context.Context,
+	current_user *user.User,
+	data *requests.CreateGroupRequest,
+) (
+	*responses.GroupNestedResponse,
+	error,
+) {
+	current_course, err := this.courseReader.GetByID(ctx, data.CourseID)
 	if err != nil {
 		return nil, err
 	}
-	if !current_course.IsUserCreator(current_user) {
+	if !current_course.IsCreatedBy(current_user.ID()) {
 		return nil, fmt.Errorf("Only course creator can create a group")
 	}
 
@@ -29,15 +37,9 @@ func (this *CreateGroup) Execute(current_user *user.User, data *requests.CreateG
 		return nil, err
 	}
 
-	if err := current_course.AddGroup(created_group.ID()); err != nil {
-		return nil, err
-	}
-
-	if err := this.groupRepo.Save(created_group); err != nil {
-		return nil, err
-	}
-
-	if err := this.courseRepo.Save(current_course); err != nil {
+	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+		return writer.SaveGroup(created_group)
+	}); err != nil {
 		return nil, err
 	}
 

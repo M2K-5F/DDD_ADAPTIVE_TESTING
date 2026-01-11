@@ -1,48 +1,47 @@
 package user_usercases
 
 import (
+	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/mappers"
+	"adaptivetesting/src/application/interfaces"
 	"adaptivetesting/src/domain/aggregates/user"
+	"context"
 	"fmt"
 )
 
 type UserRegistration struct {
-	userRepo user.IUserRepository
+	writer     interfaces.IWriter
+	userReader interfaces.IUserReader
 }
 
-func (r *UserRegistration) Execute(data requests.RegisterUserDTO) (*responses.UserResponse, error) {
-	if r.userRepo.IsUsernameExists(data.UserName) {
+func (this *UserRegistration) Execute(ctx context.Context, data requests.RegisterUserDTO) (*responses.UserResponse, error) {
+	if this.userReader.IsUserNameExists(ctx, data.UserName) {
 		return nil, fmt.Errorf("Username already exists")
 	}
 
-	newUser, err := r.createUserByRole(data)
+	newUser, err := this.createUserByRole(data)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.userRepo.Create(newUser); err != nil {
+	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+		return writer.SaveUser(newUser)
+	}); err != nil {
 		return nil, err
 	}
 
-	return mappers.UserToDTO(newUser), nil
+	return mappers.UserToResponse(newUser), nil
 }
 
 func (uc *UserRegistration) createUserByRole(data requests.RegisterUserDTO) (*user.User, error) {
 	switch data.Role {
 	case requests.Teacher:
-		return user.NewTeacher(data.UserName, data.Password)
+		return user.Fabric.CreateTeacher(data.UserName, data.Password)
 	case requests.Student:
-		return user.NewStudent(data.UserName, data.Password)
+		return user.Fabric.CreateStudent(data.UserName, data.Password)
 	default:
 		return nil, fmt.Errorf("unknown role: %s", data.Role)
-	}
-}
-
-func (UserRegistration) Fabric(userRepoImplementation user.IUserRepository) *UserRegistration {
-	return &UserRegistration{
-		userRepo: userRepoImplementation,
 	}
 }

@@ -1,25 +1,34 @@
 package course_usercases
 
 import (
+	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/mappers"
-	"adaptivetesting/src/domain/aggregates/course"
+	"adaptivetesting/src/application/interfaces"
 	"adaptivetesting/src/domain/aggregates/user"
+	"context"
 	"fmt"
 )
 
 type CourseAchive struct {
-	courseRepo course.ICourseRepository
+	courseReader interfaces.ICourseReader
+	writer       interfaces.IWriter
 }
 
-func (uc *CourseAchive) Execute(current_user user.User, data *requests.ArchiveCourseDTO) (*responses.CourseResponseWithUser, error) {
-	crs, err := uc.courseRepo.GetById(data.CourseID)
+func (this *CourseAchive) Execute(
+	ctx context.Context,
+	current_user *user.User,
+	data *requests.ArchiveCourseDTO,
+) (
+	*responses.CourseNestedResponse,
+	error,
+) {
+	crs, err := this.courseReader.GetByID(ctx, data.CourseID)
 	if err != nil {
 		return nil, err
 	}
 
-	if !crs.IsUserCreator(current_user) {
+	if !crs.IsCreatedBy(current_user.ID()) {
 		return nil, fmt.Errorf("You not a creator of this course")
 	}
 
@@ -27,9 +36,11 @@ func (uc *CourseAchive) Execute(current_user user.User, data *requests.ArchiveCo
 		return nil, err
 	}
 
-	if err := uc.courseRepo.Save(crs); err != nil {
+	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+		return writer.SaveCourse(crs)
+	}); err != nil {
 		return nil, err
 	}
 
-	return mappers.CourseToResponseWithUser(crs, &current_user), nil
+	return mappers.CourseToNestedResponse(crs, current_user), nil
 }

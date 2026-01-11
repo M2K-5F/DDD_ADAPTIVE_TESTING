@@ -1,32 +1,20 @@
 package question
 
 import (
-	"adaptivetesting/src/domain/aggregates/identificators"
-	"adaptivetesting/src/domain/aggregates/topic"
+	"adaptivetesting/src/domain/identificators"
+	"fmt"
 
 	"github.com/google/uuid"
 )
 
-type AnswerDTO struct {
-	Text      string
+type AnswerCreate struct {
 	IsCorrect bool
+	Text      string
 }
 
-func NewQuestion(topic topic.Topic, text string, answers []AnswerDTO) (*Question, error) {
-	var answerList []Answer
+type QuestionFabric struct{}
 
-	for i, answerDTO := range answers {
-		answer, err := NewAnswer(i+1, answerDTO.Text, answerDTO.IsCorrect)
-
-		if err != nil {
-			return nil, err
-		}
-
-		answerList = append(
-			answerList,
-			*answer,
-		)
-	}
+func (this QuestionFabric) CreateQuestion(topic identificators.TopicID, text string, answers []*AnswerCreate) (*Question, error) {
 
 	textVO, err := NewQuestionText(text)
 
@@ -34,10 +22,39 @@ func NewQuestion(topic topic.Topic, text string, answers []AnswerDTO) (*Question
 		return nil, err
 	}
 
+	var answerEntities []*Answer
+	for i, answerCreate := range answers {
+		answerEntity, err := this.createAnswer(answerCreate.Text, answerCreate.IsCorrect, i+1)
+		if err != nil {
+			return nil, err
+		}
+
+		answerEntities = append(answerEntities, answerEntity)
+	}
+
 	return &Question{
-		id:      identificators.QuestionID(uuid.New()),
-		topicID: topic.ID(),
-		text:    textVO,
-		answers: answerList,
+		id:        identificators.QuestionID(uuid.New()),
+		byTopicID: topic,
+		text:      textVO,
+		answers:   answerEntities,
 	}, nil
 }
+
+func (QuestionFabric) createAnswer(text string, isCorrect bool, serialNumber int) (*Answer, error) {
+	answerText, err := NewAnswertext(text)
+	if err != nil {
+		return nil, err
+	}
+
+	if serialNumber < 1 {
+		return nil, fmt.Errorf("Answer serial number cannot be less 1")
+	}
+
+	return &Answer{
+		text:         answerText,
+		isCorrect:    isCorrect,
+		serialNumber: serialNumber,
+	}, nil
+}
+
+var Fabric = QuestionFabric{}

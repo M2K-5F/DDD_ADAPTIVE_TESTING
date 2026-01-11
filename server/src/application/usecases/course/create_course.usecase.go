@@ -1,23 +1,37 @@
 package course_usercases
 
 import (
+	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/mappers"
+	"adaptivetesting/src/application/interfaces"
 	"adaptivetesting/src/domain/aggregates/course"
 	"adaptivetesting/src/domain/aggregates/user"
+	"context"
 )
 
 type CourseCreate struct {
-	courseRepo course.ICourseRepository
+	writer interfaces.IWriter
 }
 
-func (uc *CourseCreate) Execute(current_user user.User, data requests.CreateCourseDTO) (*responses.CourseResponseWithUser, error) {
-	crs, err := course.NewCourse(current_user, data.Name)
+func (this *CourseCreate) Execute(
+	ctx context.Context,
+	current_user user.User,
+	data requests.CreateCourseDTO,
+) (
+	*responses.CourseNestedResponse,
+	error,
+) {
+	crs, err := course.Fabric.CreateCourse(current_user.ID(), data.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	uc.courseRepo.Save(crs)
-	return mappers.CourseToResponseWithUser(crs, &current_user), nil
+	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+		return writer.SaveCourse(crs)
+	}); err != nil {
+		return nil, err
+	}
+
+	return mappers.CourseToNestedResponse(crs, &current_user), nil
 }

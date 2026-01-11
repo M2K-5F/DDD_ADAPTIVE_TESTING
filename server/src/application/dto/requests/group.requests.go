@@ -1,6 +1,6 @@
 package requests
 
-import "adaptivetesting/src/domain/aggregates/identificators"
+import "adaptivetesting/src/domain/identificators"
 
 type CreateGroupRequest struct {
 	Name            string

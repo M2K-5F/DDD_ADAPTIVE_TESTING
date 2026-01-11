@@ -1,13 +1,14 @@
 package requests
 
 import (
-	"adaptivetesting/src/domain/aggregates/identificators"
+	"adaptivetesting/src/domain/identificators"
 )
 
 type CreateQuestionRequest struct {
-	Text    string
-	TopicID identificators.TopicID
-	Answers []AnswerRequest
+	CourseID identificators.CourseID
+	Text     string
+	TopicID  identificators.TopicID
+	Answers  []AnswerRequest
 }
 
 type AnswerRequest struct {

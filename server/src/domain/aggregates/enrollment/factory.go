@@ -1,21 +1,25 @@
 package enrollment
 
 import (
-	"adaptivetesting/src/domain/aggregates/course"
-	"adaptivetesting/src/domain/aggregates/group"
-	"adaptivetesting/src/domain/aggregates/identificators"
-	"adaptivetesting/src/domain/aggregates/user"
-
-	"github.com/google/uuid"
+	"adaptivetesting/src/domain/identificators"
 )
 
-func NewEnrollment(group group.Group, course course.Course, user user.User) *Enrollment {
+type EnrollmentFabric struct{}
+
+func (EnrollmentFabric) CreateEnrollment(
+	groupID identificators.GroupID,
+	courseID identificators.CourseID,
+	userID identificators.UserID,
+) (
+	*Enrollment,
+	error,
+) {
 	return &Enrollment{
-		id:            identificators.EnrollmentID(uuid.New()),
-		groupID:       group.ID(),
-		courseID:      course.ID(),
-		userID:        user.ID(),
-		topicProgress: map[identificators.TopicID]*TopicProgress{},
-		progress:      0,
-	}
+		id:              identificators.NewEnrollmentID(),
+		groupID:         groupID,
+		courseID:        courseID,
+		userID:          userID,
+		topicProgresses: []*TopicProgress{},
+		progress:        0,
+	}, nil
 }

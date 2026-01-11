@@ -1,7 +1,7 @@
 package requests
 
 import (
-	"adaptivetesting/src/domain/aggregates/identificators"
+	"adaptivetesting/src/domain/identificators"
 )
 
 type CreateTopicRequest struct {

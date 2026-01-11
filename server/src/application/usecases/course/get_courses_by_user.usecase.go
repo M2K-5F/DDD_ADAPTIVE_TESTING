@@ -1,22 +1,27 @@
 package course_usercases
 
 import (
+	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/mappers"
-	"adaptivetesting/src/domain/aggregates/course"
-	"adaptivetesting/src/domain/aggregates/user"
+	"adaptivetesting/src/application/interfaces"
+	"context"
 	"fmt"
 )
 
 type GetCoursesCreatedByUser struct {
-	courseRepo course.ICourseRepository
-	userRepo   user.IUserRepository
+	courseReader interfaces.ICourseReader
+	userReader   interfaces.IUserReader
 }
 
-func (this *GetCoursesCreatedByUser) Execute(data *requests.GetCoursesByUserDTO) (*[]responses.CourseResponseWithUser, error) {
-
-	current_techer, err := this.userRepo.GetByID(data.UserID)
+func (this *GetCoursesCreatedByUser) Execute(
+	ctx context.Context,
+	data *requests.GetCoursesByUserDTO,
+) (
+	*[]responses.CourseNestedResponse,
+	error,
+) {
+	current_techer, err := this.userReader.GetByID(ctx, data.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,15 +30,15 @@ func (this *GetCoursesCreatedByUser) Execute(data *requests.GetCoursesByUserDTO)
 		return nil, fmt.Errorf("This user is not a teacher")
 	}
 
-	courses, err := this.courseRepo.ListByUserID(data.UserID)
+	courses, err := this.courseReader.SelectCreatedByUser(ctx, data.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	var response []responses.CourseResponseWithUser
+	var response []responses.CourseNestedResponse
 
 	for _, crs := range courses {
-		response = append(response, *mappers.CourseToResponseWithUser(&crs, current_techer))
+		response = append(response, *mappers.CourseToNestedResponse(crs, current_techer))
 	}
 
 	return &response, nil
