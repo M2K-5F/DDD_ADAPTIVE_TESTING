@@ -1,6 +1,7 @@
 package database
 
 import (
+	"adaptivetesting/src/application/interfaces"
 	"adaptivetesting/src/domain/aggregates/course"
 	"adaptivetesting/src/domain/aggregates/group"
 	"adaptivetesting/src/domain/aggregates/question"
@@ -44,7 +45,7 @@ func (this *TransactionWriter) SaveTopic(topic *topic.Topic) error {
 
 func (txm *Writer) Execute(
 	ctx context.Context,
-	fn func(w *TransactionWriter) error,
+	fn func(w interfaces.ITransactionWriter) error,
 ) (err error) {
 	tx, err := txm.pool.Begin(ctx)
 	if err != nil {
@@ -62,4 +63,8 @@ func (txm *Writer) Execute(
 	}
 
 	return tx.Commit(ctx)
+}
+
+func NewWriter(pool *pgxpool.Pool) *Writer {
+	return &Writer{pool: pool}
 }

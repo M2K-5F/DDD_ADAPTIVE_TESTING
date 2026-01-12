@@ -32,7 +32,7 @@ func (this *CreateGroup) Execute(
 		return nil, fmt.Errorf("Only course creator can create a group")
 	}
 
-	created_group, err := group.NewGroup(*current_course, data.Name, data.MaxStudentCount)
+	created_group, err := group.Fabric.CreateGroup(current_user.ID(), current_course.ID(), data.Name, data.MaxStudentCount)
 	if err != nil {
 		return nil, err
 	}

@@ -59,3 +59,5 @@ func (GroupFabric) Recover(
 		studentCount:    studentCount,
 	}, nil
 }
+
+var Fabric = GroupFabric{}

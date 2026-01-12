@@ -13,19 +13,18 @@ type UserRows struct {
 }
 
 type CourseRows struct {
-	ID          string
-	CreatedByID string
-	Name        string
-	IsArchived  bool
+	ID          string `db:"id"`
+	CreatedByID string `db:"created_by_id"`
+	Name        string `db:"name"`
+	IsArchived  bool   `db:"is_archived"`
 }
 
 type TopicRows struct {
-	ID            string
-	CreatedByID   string
-	ByCourseID    string
-	Name          string
-	IsArchived    bool
-	QuestionCount int
+	ID          string `db:"id"`
+	CreatedByID string `db:"created_by_id"`
+	ByCourseID  string `db:"by_course_id"`
+	Name        string `db:"name"`
+	IsArchived  bool   `db:"is_archived"`
 }
 
 type QuestionRows struct {

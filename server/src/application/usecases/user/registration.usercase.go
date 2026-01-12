@@ -45,3 +45,10 @@ func (uc *UserRegistration) createUserByRole(data requests.RegisterUserDTO) (*us
 		return nil, fmt.Errorf("unknown role: %s", data.Role)
 	}
 }
+
+func FabricRegistration(writer interfaces.IWriter, reader interfaces.IUserReader) *UserRegistration {
+	return &UserRegistration{
+		userReader: reader,
+		writer:     writer,
+	}
+}

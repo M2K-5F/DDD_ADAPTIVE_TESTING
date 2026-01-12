@@ -53,10 +53,7 @@ func (UserFabric) Recover(id string, username string, registeredAt time.Time, pa
 		return nil, err
 	}
 
-	passwordVO, err := NewPassword(passwordHash)
-	if err != nil {
-		return nil, err
-	}
+	passwordVO := Password(passwordHash)
 
 	var rolesVO []Role
 	for _, role := range roles {

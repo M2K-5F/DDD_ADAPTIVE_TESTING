@@ -13,27 +13,8 @@ type User struct {
 	passwordHash Password
 }
 
-// GETTERS
 func (this *User) ID() identificators.UserID {
 	return this.id
-}
-
-func (u *User) IsStudent() bool {
-	for _, role := range u.roles {
-		if role == StudentRole {
-			return true
-		}
-	}
-	return false
-}
-
-func (u *User) IsTeacher() bool {
-	for _, role := range u.roles {
-		if role == TeacherRole {
-			return true
-		}
-	}
-	return false
 }
 
 func (u *User) UserName() Username {
@@ -48,6 +29,25 @@ func (u *User) RegisteredAt() time.Time {
 	return u.registeredAt
 }
 
-func (u *User) VerifyPassword(plain string) bool {
-	return u.passwordHash.Verify(plain)
+type UserPersistense struct {
+	ID           string
+	RegisteredAt time.Time
+	UserName     string
+	Roles        []string
+	PasswordHash string
+}
+
+func (this *User) ToPersistense() *UserPersistense {
+	var persistenseRoles []string
+	for _, role := range this.roles {
+		persistenseRoles = append(persistenseRoles, role.String())
+	}
+
+	return &UserPersistense{
+		ID:           this.id.String(),
+		RegisteredAt: this.registeredAt,
+		UserName:     this.userName.String(),
+		Roles:        persistenseRoles,
+		PasswordHash: string(this.passwordHash),
+	}
 }

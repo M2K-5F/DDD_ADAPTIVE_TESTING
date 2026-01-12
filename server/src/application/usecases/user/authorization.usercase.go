@@ -29,3 +29,9 @@ func (this *UserAuthorization) Execute(ctx context.Context, data *requests.AuthU
 
 	return mappers.UserToResponse(usr), nil
 }
+
+func FabricAuthorization(userReader interfaces.IUserReader) *UserAuthorization {
+	return &UserAuthorization{
+		userReader: userReader,
+	}
+}

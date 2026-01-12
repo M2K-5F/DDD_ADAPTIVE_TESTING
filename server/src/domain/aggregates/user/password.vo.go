@@ -21,5 +21,6 @@ func NewPassword(plain string) (Password, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return Password(hashed), nil
 }

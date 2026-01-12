@@ -62,7 +62,7 @@ func (this *CourseReader) GetByName(ctx context.Context, name string) (*course.C
 
 func (this *CourseReader) SelectCreatedByUser(ctx context.Context, userID identificators.UserID) ([]*course.Course, error) {
 	var rows []models.CourseRows
-	err := pgxscan.Select(ctx, this.pool, rows, `
+	err := pgxscan.Select(ctx, this.pool, &rows, `
 		select c.id, c.created_by_id, c.name, c.is_archived
 		from courses c 
 		where c.created_by_id = $1

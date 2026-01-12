@@ -2,56 +2,47 @@ package main
 
 import (
 	"adaptivetesting/src/application/dto/requests"
-	question_usercases "adaptivetesting/src/application/usecases/question"
-	"adaptivetesting/src/domain/aggregates/identificators"
-	"adaptivetesting/src/domain/aggregates/question"
-	"adaptivetesting/src/domain/aggregates/topic"
-	"adaptivetesting/src/domain/aggregates/user"
+	user_usercases "adaptivetesting/src/application/usecases/user"
+	"adaptivetesting/src/infrastructure/persistense/queries"
+	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type RepoQ struct{}
-
-func (this *RepoQ) Save(question *question.Question) error {
-	return nil
-}
-
-func (this *RepoQ) GetByID(id identificators.QuestionID) (*question.Question, error) {
-	return &question.Question{}, nil
-}
-
-type RepoT struct{}
-
-func (this *RepoT) Save(*topic.Topic) error {
-	return nil
-}
-
-func (this *RepoT) GetByID(id identificators.TopicID) (*topic.Topic, error) {
-	return &topic.Topic{}, nil
+func getPool(ctx context.Context) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(ctx, "postgres://postgres:postgres@localhost:5433/testdb?sslmode=disable&pool_max_conns=10")
+	if err != nil {
+		return nil, err
+	}
+	return pool, nil
 }
 
 func main() {
-	CreateQuestion, err := question_usercases.Fabric(&(RepoT{}), &(RepoQ{}))
+	ctx := context.Background()
+	pool, err := getPool(ctx)
+	if err != nil {
+		panic(err)
+	}
+	// writer := database.NewWriter(pool)
+	reader := queries.NewUserReader(pool)
+	pool.Exec(ctx, "select * from users")
+	start := time.Now()
+	// _, err = user_usercases.FabricRegistration(writer, reader).Execute(ctx, requests.RegisterUserDTO{UserName: "user1", Password: "12345", Role: requests.Teacher})
+	// if err != nil {
+	// 	panic(err)
+	// }
+	res, err := user_usercases.FabricAuthorization(reader).Execute(ctx, &requests.AuthUserDTO{UserName: "user1", Password: "12345"})
+	if err != nil {
+		panic(err)
+	}
+	end := time.Since(start)
+	jsn, err := json.Marshal(res)
 	if err != nil {
 		panic(err)
 	}
 
-	current_user, err := user.NewTeacher("Penis", "12345")
-	if err != nil {
-		panic(err)
-	}
-
-	created_question, err := CreateQuestion.Execute(current_user, &requests.CreateQuestionRequest{
-		Text:    "Question Penisaaa",
-		Answers: []requests.AnswerRequest{{Text: ".!.kdhvouidmucdifynvdsad", IsCorrect: true}, {Text: "Not Penisofsndfiufhnkduvsduf", IsCorrect: false}},
-	})
-	if err != nil {
-		panic(err)
-	}
-	jsoned, err := json.Marshal(created_question)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(jsoned))
+	fmt.Println(string(jsn), end)
 }

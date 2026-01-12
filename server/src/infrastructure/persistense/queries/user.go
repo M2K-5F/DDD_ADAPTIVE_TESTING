@@ -43,8 +43,8 @@ func (this *UserReader) GetByUserName(ctx context.Context, username string) (*us
 		select u.id, u.user_name, u.password_hash, u.registered_at, array_agg(r.role_name) as roles from users u
 		inner join user_roles ur on ur.user_id = u.id
 		inner join roles r on ur.role_id = r.role_name
+		where u.user_name = $1
 		group by u.id
-		where u.username = $1
 		limit 1;
 	`, username)
 
@@ -64,4 +64,8 @@ func (this *UserReader) IsUserNameExists(ctx context.Context, username string) b
 		return false
 	}
 	return exists
+}
+
+func NewUserReader(pool *pgxpool.Pool) *UserReader {
+	return &UserReader{pool: pool}
 }
