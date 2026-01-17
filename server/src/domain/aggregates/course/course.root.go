@@ -26,3 +26,19 @@ func (c *Course) CreatedByID() identificators.UserID {
 func (c *Course) IsArchived() bool {
 	return c.isArchived
 }
+
+type CoursePersistense struct {
+	ID          string
+	CreatedByID string
+	Name        string
+	IsArchived  bool
+}
+
+func (this *Course) ToPersistense() *CoursePersistense {
+	return &CoursePersistense{
+		ID:          this.id.String(),
+		Name:        this.name.String(),
+		CreatedByID: this.createdByID.String(),
+		IsArchived:  this.isArchived,
+	}
+}

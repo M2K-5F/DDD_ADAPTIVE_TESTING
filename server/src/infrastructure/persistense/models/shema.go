@@ -28,9 +28,10 @@ type TopicRows struct {
 }
 
 type QuestionRows struct {
-	ID        string
-	ByTopicID string
-	Text      string
+	ID         string
+	ByTopicID  string
+	ByCourseID string
+	Text       string
 }
 
 type AnswerRows struct {

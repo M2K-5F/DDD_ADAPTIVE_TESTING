@@ -10,13 +10,8 @@ import (
 	"fmt"
 )
 
-type UserRegistration struct {
-	writer     interfaces.IWriter
-	userReader interfaces.IUserReader
-}
-
-func (this *UserRegistration) Execute(ctx context.Context, data requests.RegisterUserDTO) (*responses.UserResponse, error) {
-	if this.userReader.IsUserNameExists(ctx, data.UserName) {
+func (this *UserUseCases) Register(ctx context.Context, data requests.RegisterUserRequest) (*responses.UserResponse, error) {
+	if this.deps.UserRdr.IsUserNameExists(ctx, data.UserName) {
 		return nil, fmt.Errorf("Username already exists")
 	}
 
@@ -26,7 +21,7 @@ func (this *UserRegistration) Execute(ctx context.Context, data requests.Registe
 		return nil, err
 	}
 
-	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+	if err := this.deps.Writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
 		return writer.SaveUser(newUser)
 	}); err != nil {
 		return nil, err
@@ -35,7 +30,7 @@ func (this *UserRegistration) Execute(ctx context.Context, data requests.Registe
 	return mappers.UserToResponse(newUser), nil
 }
 
-func (uc *UserRegistration) createUserByRole(data requests.RegisterUserDTO) (*user.User, error) {
+func (this *UserUseCases) createUserByRole(data requests.RegisterUserRequest) (*user.User, error) {
 	switch data.Role {
 	case requests.Teacher:
 		return user.Fabric.CreateTeacher(data.UserName, data.Password)
@@ -43,12 +38,5 @@ func (uc *UserRegistration) createUserByRole(data requests.RegisterUserDTO) (*us
 		return user.Fabric.CreateStudent(data.UserName, data.Password)
 	default:
 		return nil, fmt.Errorf("unknown role: %s", data.Role)
-	}
-}
-
-func FabricRegistration(writer interfaces.IWriter, reader interfaces.IUserReader) *UserRegistration {
-	return &UserRegistration{
-		userReader: reader,
-		writer:     writer,
 	}
 }

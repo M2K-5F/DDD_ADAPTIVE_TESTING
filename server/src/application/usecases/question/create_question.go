@@ -11,13 +11,7 @@ import (
 	"fmt"
 )
 
-type CreateQuestion struct {
-	questionReader interfaces.IQuestionReader
-	topicReader    interfaces.ITopicReader
-	writer         interfaces.IWriter
-}
-
-func (this CreateQuestion) Execute(
+func (this QuestionUseCases) Create(
 	ctx context.Context,
 	current_user *user.User,
 	data *requests.CreateQuestionRequest,
@@ -29,7 +23,7 @@ func (this CreateQuestion) Execute(
 		return nil, fmt.Errorf("Only teachers can create a questions")
 	}
 
-	current_topic, err := this.topicReader.GetByID(ctx, data.TopicID)
+	current_topic, err := this.deps.TopicReader.GetByID(ctx, data.TopicID)
 	if err != nil {
 		return nil, err
 	}
@@ -38,26 +32,12 @@ func (this CreateQuestion) Execute(
 		return nil, fmt.Errorf("Only topic creators can add questions to this topic")
 	}
 
-	var answers []*question.AnswerCreate
-	for _, ans := range data.Answers {
-		if err != nil {
-			return nil, err
-		}
-		answers = append(
-			answers,
-			&question.AnswerCreate{
-				Text:      ans.Text,
-				IsCorrect: ans.IsCorrect,
-			},
-		)
-	}
-
-	createdQuestion, err := question.Fabric.CreateQuestion(current_topic.ID(), data.Text, answers)
+	createdQuestion, err := question.Fabric.CreateQuestion(current_topic.ID(), current_topic.ByCourseID(), data.Text, data.Answers)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+	if err := this.deps.Writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
 		return writer.SaveQuestion(createdQuestion)
 	}); err != nil {
 		return nil, err

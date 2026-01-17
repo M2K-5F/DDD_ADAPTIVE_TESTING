@@ -10,11 +10,7 @@ import (
 	"context"
 )
 
-type CourseCreate struct {
-	writer interfaces.IWriter
-}
-
-func (this *CourseCreate) Execute(
+func (this *CourseUseCases) Create(
 	ctx context.Context,
 	current_user user.User,
 	data requests.CreateCourseDTO,
@@ -27,7 +23,7 @@ func (this *CourseCreate) Execute(
 		return nil, err
 	}
 
-	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+	if err := this.deps.Writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
 		return writer.SaveCourse(crs)
 	}); err != nil {
 		return nil, err

@@ -1,4 +1,4 @@
-package queries
+package readers
 
 import (
 	"adaptivetesting/src/domain/aggregates/course"

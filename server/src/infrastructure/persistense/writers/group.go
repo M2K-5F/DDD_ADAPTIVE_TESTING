@@ -1,4 +1,4 @@
-package commands
+package writers
 
 import (
 	"adaptivetesting/src/domain/aggregates/group"

@@ -1,4 +1,4 @@
-package course_usercases
+package topic_usecases
 
 import (
 	"adaptivetesting/src/application/dto/mappers"
@@ -11,12 +11,7 @@ import (
 	"fmt"
 )
 
-type CreateTopic struct {
-	writer       interfaces.IWriter
-	courseReader interfaces.ICourseReader
-}
-
-func (this CreateTopic) Execute(
+func (this *TopicUseCases) Execute(
 	ctx context.Context,
 	current_user *user.User,
 	data requests.CreateTopicRequest,
@@ -28,7 +23,7 @@ func (this CreateTopic) Execute(
 		return nil, fmt.Errorf("Only teachers can create topics")
 	}
 
-	current_course, err := this.courseReader.GetByID(ctx, data.CourseId)
+	current_course, err := this.deps.CourseRdr.GetByID(ctx, data.CourseId)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +38,7 @@ func (this CreateTopic) Execute(
 		data.CourseId,
 	)
 
-	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+	if err := this.deps.Writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
 		return writer.SaveTopic(createdTopic)
 	}); err != nil {
 		return nil, err

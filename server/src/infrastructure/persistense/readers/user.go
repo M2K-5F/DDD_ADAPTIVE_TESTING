@@ -1,4 +1,4 @@
-package queries
+package readers
 
 import (
 	"adaptivetesting/src/domain/aggregates/user"
@@ -19,6 +19,7 @@ type UserReader struct {
 
 func (this *UserReader) GetByID(ctx context.Context, userID identificators.UserID) (*user.User, error) {
 	var rows models.UserRows
+
 	err := pgxscan.Get(ctx, this.pool, &rows, `
 		select u.id, u.user_name, u.password_hash, u.registered_at, array_agg(r.role_name) as roles from users u
 		inner join user_roles ur on ur.user_id = u.id
@@ -26,7 +27,9 @@ func (this *UserReader) GetByID(ctx context.Context, userID identificators.UserI
 		group by u.id
 		where u.id = $1
 		limit 1;
-	`, userID.String())
+		`,
+		userID.String(),
+	)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

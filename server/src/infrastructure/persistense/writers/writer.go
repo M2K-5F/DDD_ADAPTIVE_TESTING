@@ -1,4 +1,4 @@
-package database
+package writers
 
 import (
 	"adaptivetesting/src/application/interfaces"
@@ -7,7 +7,6 @@ import (
 	"adaptivetesting/src/domain/aggregates/question"
 	"adaptivetesting/src/domain/aggregates/topic"
 	"adaptivetesting/src/domain/aggregates/user"
-	"adaptivetesting/src/infrastructure/persistense/commands"
 	"context"
 
 	"github.com/jackc/pgx/v5"
@@ -24,23 +23,23 @@ type TransactionWriter struct {
 }
 
 func (this *TransactionWriter) SaveUser(user *user.User) error {
-	return commands.SaveUser(this.ctx, this.txn, user)
+	return SaveUser(this.ctx, this.txn, user)
 }
 
 func (this *TransactionWriter) SaveCourse(course *course.Course) error {
-	return commands.SaveCourse(this.ctx, this.txn, course)
+	return SaveCourse(this.ctx, this.txn, course)
 }
 
 func (this *TransactionWriter) SaveQuestion(question *question.Question) error {
-	return commands.SaveQuestion(this.ctx, this.txn, question)
+	return SaveQuestion(this.ctx, this.txn, question)
 }
 
 func (this *TransactionWriter) SaveGroup(group *group.Group) error {
-	return commands.SaveGroup(this.ctx, this.txn, group)
+	return SaveGroup(this.ctx, this.txn, group)
 }
 
 func (this *TransactionWriter) SaveTopic(topic *topic.Topic) error {
-	return commands.SaveTopic(this.ctx, this.txn, topic)
+	return SaveTopic(this.ctx, this.txn, topic)
 }
 
 func (txm *Writer) Execute(

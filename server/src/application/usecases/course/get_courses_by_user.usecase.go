@@ -4,24 +4,18 @@ import (
 	"adaptivetesting/src/application/dto/mappers"
 	"adaptivetesting/src/application/dto/requests"
 	"adaptivetesting/src/application/dto/responses"
-	"adaptivetesting/src/application/interfaces"
 	"context"
 	"fmt"
 )
 
-type GetCoursesCreatedByUser struct {
-	courseReader interfaces.ICourseReader
-	userReader   interfaces.IUserReader
-}
-
-func (this *GetCoursesCreatedByUser) Execute(
+func (this *CourseUseCases) GetByCreator(
 	ctx context.Context,
 	data *requests.GetCoursesByUserDTO,
 ) (
 	*[]responses.CourseNestedResponse,
 	error,
 ) {
-	current_techer, err := this.userReader.GetByID(ctx, data.UserID)
+	current_techer, err := this.deps.UserRdr.GetByID(ctx, data.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +24,7 @@ func (this *GetCoursesCreatedByUser) Execute(
 		return nil, fmt.Errorf("This user is not a teacher")
 	}
 
-	courses, err := this.courseReader.SelectCreatedByUser(ctx, data.UserID)
+	courses, err := this.deps.CourseRdr.SelectCreatedByUser(ctx, data.UserID)
 	if err != nil {
 		return nil, err
 	}

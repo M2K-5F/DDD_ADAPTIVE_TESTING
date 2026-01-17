@@ -39,23 +39,24 @@ create table if not EXISTS topics (
     is_archived boolean not null
 );
 
--- create table if not EXISTS questions (
---     id text primary key,
+create table if not EXISTS questions (
+    id text primary key,
 
---     by_topic_id text references topics (id),
---     text text not null
--- );
+    by_topic_id text references topics (id),
+    by_course_id text references courses (id),
 
--- create table if not exists answers (
---     id bigserial primary key, 
+    text text not null
+);
 
---     by_question_id text references questions (id),
---     text text not null,
---     is_correct boolean default false,
---     serial_number integer,
+create table if not exists answers (
+    by_question_id text references questions (id),
 
---     unique(text, by_question_id)
--- );
+    text text not null,
+    is_correct boolean not null,
+    serial_number integer not null
+
+    primary key (by_question_id, serial_number)
+);
 
 -- create table if not exists groups (
 --     id text primary key,

@@ -41,3 +41,39 @@ func (this *Question) GetAnswerBySerial(number int) (*Answer, error) {
 	}
 	return nil, fmt.Errorf("Answer with serial (%d) not found", number)
 }
+
+type QuestionPersistense struct {
+	ID         string
+	ByTopicID  string
+	ByCourseID string
+	Text       string
+	Answers    []*AnswerPersistense
+}
+
+type AnswerPersistense struct {
+	SerialNumber int
+	Text         string
+	IsCorrect    bool
+}
+
+func (this *Question) ToPersistense() *QuestionPersistense {
+	var answers []*AnswerPersistense
+	for _, answer := range this.answers {
+		answers = append(answers,
+			&AnswerPersistense{
+				SerialNumber: answer.serialNumber,
+				Text:         answer.text.String(),
+				IsCorrect:    answer.isCorrect,
+			})
+	}
+
+	question := &QuestionPersistense{
+		ID:         this.id.String(),
+		ByTopicID:  this.byTopicID.String(),
+		ByCourseID: this.byCourseID.String(),
+		Text:       this.text.String(),
+		Answers:    answers,
+	}
+
+	return question
+}

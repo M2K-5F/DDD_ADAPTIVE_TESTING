@@ -7,13 +7,13 @@ const (
 	Student Role = "Student"
 )
 
-type RegisterUserDTO struct {
+type RegisterUserRequest struct {
 	UserName string
 	Role     Role
 	Password string
 }
 
-type AuthUserDTO struct {
+type AuthUserRequest struct {
 	UserName string
 	Password string
 }

@@ -10,12 +10,7 @@ import (
 	"fmt"
 )
 
-type CourseUnarchive struct {
-	courseReader interfaces.ICourseReader
-	writer       interfaces.IWriter
-}
-
-func (this CourseUnarchive) Execute(
+func (this *CourseUseCases) Unarchive(
 	ctx context.Context,
 	current_user *user.User,
 	data requests.ArchiveCourseDTO,
@@ -23,7 +18,7 @@ func (this CourseUnarchive) Execute(
 	*responses.CourseNestedResponse,
 	error,
 ) {
-	crs, err := this.courseReader.GetByID(ctx, data.CourseID)
+	crs, err := this.deps.CourseRdr.GetByID(ctx, data.CourseID)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +31,7 @@ func (this CourseUnarchive) Execute(
 		return nil, err
 	}
 
-	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+	if err := this.deps.Writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
 		return writer.SaveCourse(crs)
 	}); err != nil {
 		return nil, err

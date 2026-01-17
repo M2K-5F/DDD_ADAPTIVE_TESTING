@@ -11,12 +11,7 @@ import (
 	"fmt"
 )
 
-type CreateGroup struct {
-	courseReader interfaces.ICourseReader
-	writer       interfaces.IWriter
-}
-
-func (this *CreateGroup) Execute(
+func (this *GroupUseCase) Execute(
 	ctx context.Context,
 	current_user *user.User,
 	data *requests.CreateGroupRequest,
@@ -24,7 +19,7 @@ func (this *CreateGroup) Execute(
 	*responses.GroupNestedResponse,
 	error,
 ) {
-	current_course, err := this.courseReader.GetByID(ctx, data.CourseID)
+	current_course, err := this.deps.CourseReader.GetByID(ctx, data.CourseID)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +32,7 @@ func (this *CreateGroup) Execute(
 		return nil, err
 	}
 
-	if err := this.writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
+	if err := this.deps.Writer.Execute(ctx, func(writer interfaces.ITransactionWriter) error {
 		return writer.SaveGroup(created_group)
 	}); err != nil {
 		return nil, err
